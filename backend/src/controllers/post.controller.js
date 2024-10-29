@@ -14,7 +14,7 @@ const postQues = async (req, res) => {
         if (!user) {
             return res.status(401).json(APIResponse.errorMethod(false, "Username/Email doesnot exist.", 401))
         }
-        // console.log(typeof user._id);
+    
         
         const { content } = req.body
         if(!content){
@@ -46,7 +46,7 @@ const postQues = async (req, res) => {
             author: user?.username,
             content
         })
-        // console.log("Post:: ", post);
+    
         
         if (!post) {
             return res.status(401).json(
@@ -71,7 +71,7 @@ const getAllPost = async (req, res) => {
         }
 
         const posts = await Post.find()
-        // console.log(posts);
+   
         if (!posts) {
             return res.status(401).json(APIResponse.errorMethod(false, "Post not able to fetch", 401))
         }

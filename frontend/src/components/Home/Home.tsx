@@ -79,7 +79,7 @@ const Home = () => {
       // console.log("Data::" ,data);
 
       dispatch(postProb(data));
-      console.log(data);
+      //console.log(data);
       setGetAllUserPost(data);
     } catch (error) {}
   }

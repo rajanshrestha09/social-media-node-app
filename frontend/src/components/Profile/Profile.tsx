@@ -49,7 +49,7 @@ const Profile = () => {
   async function userProfile() {
     const user = await axios.get(`/api/v1/users/${authorID}`);
 
-    console.log("Profile User::", user.data.data);
+   // console.log("Profile User::", user.data.data);
     setUser(user.data.data);
     setProfilePicUrl(user.data.data.profilePic)
   }
@@ -66,7 +66,7 @@ const Profile = () => {
   );
 
   async function onSubmit(values: any) {
-    console.log("VAlue::", values);
+    //console.log("VAlue::", values);
     try {
       const response = await axios.post(
         "/api/v1/users/user-profile-pic",
@@ -78,7 +78,7 @@ const Profile = () => {
         }
       );
       if (response.data.success) {
-        console.log(`User:`, response.data.data);
+       // console.log(`User:`, response.data.data);
         dispatch(login(response.data.data));
         handleProfileImageUpdate(response.data.data.profilePic);
         form.reset();
@@ -88,7 +88,7 @@ const Profile = () => {
         });
       }
     } catch (error) {
-      console.log("Something wrong while uploading pic.");
+     // console.log("Something wrong while uploading pic.");
       toast({
         title: "Profile Image",
         description: `Imgae uploaded fail:: ${error}`,

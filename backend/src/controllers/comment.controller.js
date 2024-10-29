@@ -12,14 +12,12 @@ const commentSchema = z.object({
 const userCommentToPost = async (req, res) => {
     try {
         const user = await User.findById(req.userId).select("-password -refreshToken -email -profilePic -bio")
-        // console.log("Comment user::", user);
+       
         if (!user) {
             return res.status(401).json(APIResponse.errorMethod(false, "Username/Email doesnot exist.", 401))
         }
         const { id, content } = req.body // From front-end
-        // console.log(content);
-        // console.log(typeof user._id);
-
+        
         const result = commentSchema.safeParse({
             commentSche: {
                 postId: id,
@@ -47,7 +45,7 @@ const userCommentToPost = async (req, res) => {
             content: content
 
         })
-        // console.log("Comment:::", comment);
+       
 
         if (!comment) {
             return res.status(401).json(
@@ -65,10 +63,10 @@ const userCommentToPost = async (req, res) => {
 
 const getCommentBaseOnPost = async (req, res) => {
     try {
-        // console.log(req.query);
+      
 
         const { postId } = req.query // value pass using btn clicked
-        // console.log(`Post id :: ${postId}`);
+       
 
         if (!postId) {
             return res.status(401).json(APIResponse.errorMethod(false, "PostId is not valid", 401))
@@ -76,7 +74,7 @@ const getCommentBaseOnPost = async (req, res) => {
         }
         const comment = await Comment.find({ postId: postId })
 
-        // console.log('Here', comment);
+       
 
         
         if (!comment) {

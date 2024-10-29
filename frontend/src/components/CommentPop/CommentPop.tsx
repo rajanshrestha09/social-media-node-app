@@ -26,9 +26,9 @@ const CommentPop = (post: Post) => {
       const response = await axios.get("/api/v1/comment/get-comment", {
         params: { postId },
       });
-      console.log(`Response :: `, response.data.statusCode);
+      //console.log(`Response :: `, response.data.statusCode);
       if (response.data.statusCode === 200) {
-        console.log("Response::", response.data.data.length);
+        // console.log("Response::", response.data.data.length);
         if (response.data.data.length === 0) {
           setComments(null);
         }

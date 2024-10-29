@@ -17,8 +17,6 @@ const loginSchema = z.object({
 const generateAccessAndRefreshToken = async (userId) => {
     try {
         const user = await User.findById(userId)
-        // console.log(`User :: ${user}`);
-
         const accessToken = user.generateAccessToken()
         const refreshToken = user.generateRefreshToken()
         user.refreshToken = refreshToken
@@ -79,7 +77,6 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const result = loginSchema.safeParse({ body: req.body })
-        // console.log(result.success)
         if (!result.success) {
             const errorMessages = result.error.errors.map((err) => ({
                 path: err.path.join('.'),
@@ -195,7 +192,6 @@ const profileImage = async (req, res) => {
     try {
         const user = await User.findById(req.userId).select("-password")
         const localProfileImagePath = req.file.path
-        console.log(user);
 
         if (!user) {
             return res.status(400).json(APIResponse.errorMethod(false, 'User not found', 400))
@@ -212,8 +208,6 @@ const profileImage = async (req, res) => {
         }
 
         user.profilePic = profileImage.url
-        console.log("Profile image", user.profilePic);
-
         if (!user.profilePic) {
             return res.status(400).json(APIResponse.errorMethod(false, 'Error while uploading on clodinary', 400))
         }
@@ -234,7 +228,6 @@ const profileImage = async (req, res) => {
 const userProfile = async (req, res) => {
     try {
         const user = await User.findById(req.params.authorID).select("-password -refreshToken -updatedAt");
-        console.log(user);
         if (!user) return res.status(400).json(APIResponse.errorMethod(false, 'User not found', 400))
         return res
             .status(200)

@@ -40,14 +40,14 @@ const Login = () => {
     },
   });
 
-  console.log(apiError);
+  //console.log(apiError);
 
   async function onSubmit(values: z.infer<typeof signInSchema>) {
     setLoading(true);
     await axios
       .post("/api/v1/users/login/", values)
       .then((response) => {
-        console.log("Response:: ",response.data.data);
+       // console.log("Response:: ",response.data.data);
         
         const userInfo = response.data.data;        
         dispatch(login(userInfo));
