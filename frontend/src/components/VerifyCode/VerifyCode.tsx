@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Form, FormControl, FormField, FormItem } from "../ui/form";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
 interface OTPFormValues {
