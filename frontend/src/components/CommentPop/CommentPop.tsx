@@ -26,9 +26,7 @@ const CommentPop = (post: Post) => {
       const response = await axios.get("/api/v1/comment/get-comment", {
         params: { postId },
       });
-      //console.log(`Response :: `, response.data.statusCode);
       if (response.data.statusCode === 200) {
-        // console.log("Response::", response.data.data.length);
         if (response.data.data.length === 0) {
           setComments(null);
         }
@@ -47,27 +45,29 @@ const CommentPop = (post: Post) => {
       <PopoverTrigger>
         <Button
           onClick={() => handleSuggestionBtn(post._id)}
-          className="mx-2 bg-green-700 hover:bg-green-900 "
+          className="mx-2 bg-green-700 hover:bg-green-900"
         >
           Read Suggestion
         </Button>
       </PopoverTrigger>
       {comments?.length !== 0 ? (
-        <PopoverContent className="outline-dotted w-92">
+        <PopoverContent className="outline-dotted w-full max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl">
           <div className="text-xl font-bold text-center mb-4">
-            Total suggestion: {comments?.length}
+            Total suggestions: {comments?.length}
           </div>
-          <ScrollArea className="h-[400px] ">
+          <ScrollArea className="h-[300px] sm:h-[400px]">
             {comments?.map((comment) => (
-              <Card key={comment?._id} className="my-2 w-[400px]">
+              <Card
+                key={comment?._id}
+                className="my-2 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto"
+              >
                 <div className="flex items-center">
                   <CardTitle className="mx-2 text-lg text-yellow-700 capitalize">
-                    {comment.authorName}{" "}
+                    {comment.authorName}
                   </CardTitle>
-                  <span className="">says:</span>
+                  <span>says:</span>
                 </div>
                 <Separator />
-
                 <CardContent className="border-2 m-2 py-2">
                   {comment.content}
                 </CardContent>
@@ -76,9 +76,8 @@ const CommentPop = (post: Post) => {
           </ScrollArea>
         </PopoverContent>
       ) : (
-        <PopoverContent className="outline-dotted w-92">
-          {" "}
-          No comment{" "}
+        <PopoverContent className="outline-dotted w-full max-w-xs sm:max-w-sm md:max-w-md text-center p-4">
+          No comments
         </PopoverContent>
       )}
     </Popover>

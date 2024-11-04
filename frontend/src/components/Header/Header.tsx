@@ -39,36 +39,36 @@ const Header = () => {
     },
   ];
   return (
-    <div className="mx-24 flex flex-row justify-between items-center  mt-2 ">
-      <div className="text-xl font-bold">Problem-To-Solution</div>
-      <div>
-        <NavigationMenu>
-          <NavigationMenuList className="flex justify-center items-center  space-x-8">
-            <NavigationMenuItem>
-              {navItems.map((item) =>
-                item.status ? (
+    <div className="w-full flex flex-col items-center mt-4 md:flex-row md:justify-between md:items-center md:space-x-4 px-4">
+      <div className="font-bold text-lg mb-4 md:mb-0">Problem-To-Solution</div>
+      <div className="w-full space-y-4 md:w-auto flex justify-center md:justify-end items-center space-x-4">
+        <NavigationMenu className="">
+          <NavigationMenuList className="flex flex-col items-center space-y-6 md:space-y-0 md:flex-row md:space-x-4 ">
+            {navItems.map((item) =>
+              item.status ? (
+                <NavigationMenuItem className="w-full md:w-auto">
                   <Link
                     to={item.path}
                     key={item.title}
-                    className="mx-1 border-2 border-slate-400 px-2 py-1 rounded-md hover:bg-slate-600"
+                    className="w-full md:w-auto text-center border-2 border-slate-400 px-3 py-2 rounded-md hover:bg-slate-600 transition duration-150 ease-in-out"
                   >
                     {item.title}
                   </Link>
-                ) : null
-              )}
-            </NavigationMenuItem>
-            <NavigationMenuItem className="flex justify-center items-center">
-              {isauth ? (
-                <Button onClick={logoutBtn} className="mr-2">
+                </NavigationMenuItem>
+              ) : null
+            )}
+
+            {isauth ? (
+              <NavigationMenuItem className="w-full md:w-auto text-center">
+                <Button onClick={logoutBtn} className="w-full md:w-auto">
                   Logout
                 </Button>
-              ) : null}
-              <ModeToggle />
-            </NavigationMenuItem>
+              </NavigationMenuItem>
+            ) : null}
+            <ModeToggle />
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      {/* <div className="flex"></div> */}
     </div>
   );
 };

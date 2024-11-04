@@ -1,5 +1,5 @@
 import { AuthLayout } from "@/components";
-import { HomePage, ProfilePage, LoginPage, SignupPage } from "./index";
+import { HomePage, ProfilePage, LoginPage, SignupPage, VerifyCodePage } from "./index";
 
 const AuthLayoutPage = [
   {
@@ -27,6 +27,15 @@ const AuthLayoutPage = [
     ),
   },
   {
+    path: "/verifycode/:username",
+    element: (
+      <AuthLayout authentication={false}>
+        <VerifyCodePage />
+      </AuthLayout>
+    )
+  },
+
+  {
     path: "/profile/:authorID",
     element: (
       <AuthLayout authentication>
@@ -34,6 +43,7 @@ const AuthLayoutPage = [
       </AuthLayout>
     ),
   },
+
 ];
 
 export default AuthLayoutPage

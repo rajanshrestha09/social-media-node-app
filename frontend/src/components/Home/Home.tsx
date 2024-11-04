@@ -62,7 +62,6 @@ const Home = () => {
         });
       }
     } catch (error) {
-      console.log("Posting post error:: Home.tsx ==> ", error);
       toast({
         title: "Post success",
         description: "Something went wront while posting.",
@@ -70,16 +69,11 @@ const Home = () => {
       });
     }
   }
-
-  // getl all the post from backend
   async function getAllPost() {
     try {
       const response = await axios.get("/api/v1/post/get-all-post");
       const data = response.data.data;
-      // console.log("Data::" ,data);
-
       dispatch(postProb(data));
-      //console.log(data);
       setGetAllUserPost(data);
     } catch (error) {}
   }
@@ -89,23 +83,23 @@ const Home = () => {
   }, [refresh]);
 
   return (
-    <div className="mx-24">
+    <div className="px-4 md:px-12 lg:px-24">
       {/* Post form setup start */}
-      <div className=" mt-8 flex justify-between items-center">
+      <div className="mt-8 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="w-full flex justify-between items-center"
+            className="w-full flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0"
           >
             <FormField
               control={form.control}
               name="content"
               render={({ field }) => (
-                <FormItem className="w-full mr-4">
+                <FormItem className="w-full md:mr-4">
                   <FormControl>
                     <Textarea
                       placeholder="Write down your problem."
-                      className="resize-none"
+                      className="resize-none w-full"
                       {...field}
                     />
                   </FormControl>
@@ -113,15 +107,21 @@ const Home = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit">Post</Button>
+            <Button type="submit" className="w-full md:w-auto">
+              Post
+            </Button>
           </form>
         </Form>
       </div>
       {/* Form setup end */}
       <Separator className="my-4 h-1" />
+
       {getAllUserPost.map((post: postInterface) => (
-        <div key={post._id} className="mx-8 flex justify-center">
-          <Card className="w-full my-2">
+        <div
+          key={post._id}
+          className="flex justify-center px-2 sm:px-4 md:px-8 lg:px-0"
+        >
+          <Card className="w-full md:max-w-2xl my-2">
             <CardHeader>
               <Link to={`/profile/${post.authorID}`}>
                 <CardTitle className="capitalize text-yellow-700">
@@ -129,12 +129,12 @@ const Home = () => {
                 </CardTitle>
               </Link>
             </CardHeader>
-            <CardContent className="">{post.content}</CardContent>
-            <CardFooter className="">
-              {/* TODO: */}
+            <CardContent>{post.content}</CardContent>
+            <CardFooter className="flex justify-between items-center">
+              {/* TODO: Additional actions */}
               {/* <Button variant="ghost" className="mx-2">
-                Like
-              </Button> */}
+            Like
+          </Button> */}
               <Suggestion {...post} />
               <CommentPop {...post} />
             </CardFooter>

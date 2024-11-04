@@ -30,43 +30,33 @@ interface User {
 
 const Profile = () => {
   const { authorID } = useParams();
-  // console.log("Author id::: ",authorID);
-
   const { toast } = useToast();
   const dispatch = useDispatch();
   const loginInUser = useSelector((state: RootState) => state.auth.userInfo);
   const [user, setUser] = useState<User>();
-  /* The line `const [profilePicUrl, setProfilePicUrl] = useState(user?.profilePic ?? "");` is
-  initializing a state variable `profilePicUrl` using the `useState` hook in React. */
-  const [profilePicUrl, setProfilePicUrl] = useState(
-    user?.profilePic ?? ""
-  );
-  // console.log(profilePicUrl);
+  const [profilePicUrl, setProfilePicUrl] = useState(user?.profilePic ?? "");
 
   const form = useForm();
-  // console.log(user);
 
   async function userProfile() {
     const user = await axios.get(`/api/v1/users/${authorID}`);
 
-   // console.log("Profile User::", user.data.data);
     setUser(user.data.data);
-    setProfilePicUrl(user.data.data.profilePic)
+    setProfilePicUrl(user.data.data.profilePic);
   }
 
   useEffect(() => {
     userProfile();
-  }, [authorID]);
+  }, [authorID,profilePicUrl]);
 
   const handleProfileImageUpdate = useCallback(
     (newImageUrl: string) => {
       setProfilePicUrl(`${newImageUrl}?${new Date().getTime()}`);
     },
-    [user]
+    [user, profilePicUrl]
   );
 
   async function onSubmit(values: any) {
-    //console.log("VAlue::", values);
     try {
       const response = await axios.post(
         "/api/v1/users/user-profile-pic",
@@ -78,7 +68,6 @@ const Profile = () => {
         }
       );
       if (response.data.success) {
-       // console.log(`User:`, response.data.data);
         dispatch(login(response.data.data));
         handleProfileImageUpdate(response.data.data.profilePic);
         form.reset();
@@ -88,7 +77,6 @@ const Profile = () => {
         });
       }
     } catch (error) {
-     // console.log("Something wrong while uploading pic.");
       toast({
         title: "Profile Image",
         description: `Imgae uploaded fail:: ${error}`,
@@ -97,12 +85,12 @@ const Profile = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <div className="flex flex-col justify-center items-center w-3/4 my-2">
-        <Card className="w-2/4 my-8 text-center">
-          <div className="flex justify-center items-center my-2">
+    <div className="flex flex-col items-center justify-center px-4 py-8">
+      <div className="flex flex-col items-center w-full max-w-md lg:max-w-lg my-4">
+        <Card className="w-full my-8 text-center">
+          <div className="flex justify-center items-center my-4">
             {user?.profilePic && (
-              <Avatar className="h-32 w-32 border-2 p-2">
+              <Avatar className="h-24 w-24 sm:h-32 sm:w-32 border-2 p-1 sm:p-2">
                 <AvatarImage
                   className="rounded-full"
                   src={`${profilePicUrl}?${new Date().getTime()}`}
@@ -115,15 +103,16 @@ const Profile = () => {
             <CardTitle className="capitalize text-yellow-700">
               {user?.username}
             </CardTitle>
-            <CardDescription>{user?.bio ?? "no bio"}</CardDescription>
+            <CardDescription>{user?.bio ?? "No bio available"}</CardDescription>
           </CardHeader>
-          <CardContent>
+
+          <CardContent className="space-y-2">
             <p>
               <span className="text-lg font-semibold">Created On:</span>{" "}
               {user?.createdAt.split("T")[0]}
             </p>
             <p>
-              <span className="text-lg font-semibold">Email: </span>{" "}
+              <span className="text-lg font-semibold">Email:</span>{" "}
               {user?.email}
             </p>
           </CardContent>
@@ -131,9 +120,9 @@ const Profile = () => {
       </div>
 
       {loginInUser?._id === user?._id && (
-        <div>
+        <div className="w-full max-w-md px-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="profilePic"
@@ -141,8 +130,7 @@ const Profile = () => {
                   <FormItem>
                     <FormControl>
                       <Input
-                        className="block my-2 w-full text-lg text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                        id="small_size"
+                        className="block w-full text-lg text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                         type="file"
                         onChange={(e) => field.onChange(e.target.files?.[0])}
                       />
@@ -150,8 +138,8 @@ const Profile = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit">
-                {profilePicUrl ? "Change Profile" : "Upload Profile"}{" "}
+              <Button type="submit" className="w-full sm:w-auto">
+                {profilePicUrl ? "Change Profile" : "Upload Profile"}
               </Button>
             </form>
           </Form>

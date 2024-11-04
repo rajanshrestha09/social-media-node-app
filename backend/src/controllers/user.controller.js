@@ -4,6 +4,7 @@ import { signUpSchema } from "../zodSchema/signUpSchema.js";
 import { signInSchema } from "../zodSchema/signInSchema.js";
 import { z } from 'zod'
 import uploadOnCloudinary from "../utils/cloudinary.js"
+import { sendVerificationEmail } from "../utils/sendVerificationEmail.js";
 
 const registerSchema = z.object({
     body: signUpSchema
@@ -12,6 +13,8 @@ const registerSchema = z.object({
 const loginSchema = z.object({
     body: signInSchema
 })
+
+
 
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -33,7 +36,6 @@ const registerUser = async (req, res) => {
     try {
         const result = registerSchema.safeParse({ body: req.body })
         if (!result.success) {
-            console.log(result.error.errors);
             const errorMessages = result.error.errors.map((err) => ({
                 path: err.path.join('.'),
                 message: err.message
@@ -43,33 +45,100 @@ const registerUser = async (req, res) => {
             )
         }
 
+        // OTP Code
+        let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+
         const { username, email, password } = req.body
-
-        const existedUser = await User.findOne({
-            $or: [{ username }, { email }]
+        const existingVerifiedUserByUsername = await User.findOne({
+            $and: [{ username }, { isUserVerified: true }]
         })
 
-        if (existedUser) {
-            return res.status(401).json(APIResponse.errorMethod(false, "Username/Email already exist.", 401))
+        if (existingVerifiedUserByUsername) {
+            return res.status(401).json(APIResponse.errorMethod(false, "Username already exist.", 401))
         }
 
-        const user = await User.create({
-            username: username.toLowerCase(),
-            email,
-            password
-        })
 
-        const createdUser = await User.findById(user._id).select("-password")
-        if (!createdUser) {
-            return res.status(401).json(APIResponse.errorMethod(false, "Something went wrong while register user.", 401))
+        const existingUserByEmail = await User.findOne({ email }).select("-password -verifyCode")
+
+
+        if (existingUserByEmail) {
+            if (existingUserByEmail.isUserVerified) {
+                return res.status(401).json(APIResponse.errorMethod(false, "User already exist with this email.", 401))
+            } else {
+                const user = await User.findByIdAndUpdate(existingUserByEmail._id,
+                    { email, username, verifyCode, password },
+                    {
+                        new: true,
+                        select: "-password -verifyCode -isUserVerified"
+                    })
+                if (!user) {
+                    return res.status(401).json(APIResponse.errorMethod(false, "Usernot updated.", 401))
+                }
+                const sendVerificationMailSuccessfully = await sendVerificationEmail(email, username, verifyCode)
+                if (!sendVerificationMailSuccessfully) {
+                    return res.status(401).json(APIResponse.errorMethod(false, "user.controller::==>Email Send failed", 401))
+                }
+                return res.status(200).json(APIResponse.successMethod(true, "Register successfully.", 200, user))
+            }
+        } else {
+            const user = await User.create({
+                username,
+                email,
+                password,
+                verifyCode
+            })
+
+            const createdUser = await User.findById(user._id).select("-password -verifyCode -isUserVerified")
+            if (!createdUser) {
+                return res.status(401).json(APIResponse.errorMethod(false, "Something went wrong while register user.", 401))
+            }
+
+            const sendVerificationMailSuccessfully = await sendVerificationEmail(email, username, verifyCode)
+            if (!sendVerificationMailSuccessfully) {
+                return res.status(401).json(APIResponse.errorMethod(false, "user.controller::==>Email Send failed", 401))
+            }
+
+            return res.status(200).json(APIResponse.successMethod(true, "Register successfully.", 200, createdUser))
         }
 
-        return res.status(200).json(APIResponse.successMethod(true, "Register successfully.", 200, createdUser))
 
     } catch (error) {
-        return res.status(500).json(APIResponse.errorMethod(false, error, 500))
+        return res.status(500).json(APIResponse.errorMethod(false, `something wrong in server:: , ${error}`, 500))
     }
 
+
+}
+
+const verifyOTPCode = async (req, res) => {
+    try {
+        const { username, verifyCode } = req.body
+        const existedUser = await User.findOne({ username })
+
+        if (!existedUser) {
+            return res.status(401).json(
+                APIResponse.errorMethod(false, "User not exist", 401)
+            )
+        }
+
+        if (existedUser.verifyCode === verifyCode) {
+            existedUser.isUserVerified = true
+            await existedUser.save()
+            return res
+                .status(200)
+                .json(
+                    APIResponse.successMethod(true, "Verify code successfully", 200)
+                )
+        }else{
+            return res
+            .status(401)
+            .json(
+                APIResponse.errorMethod(false, "OTP not match. Please check OTP code", 401)
+            )
+        }
+    }
+    catch (error) {
+        return res.status(500).json(APIResponse.errorMethod(false, error.message, 500))
+    }
 
 }
 
@@ -90,13 +159,19 @@ const loginUser = async (req, res) => {
         const { username, password } = req.body
 
         const existedUser = await User.findOne({
-            $or: [
-                {
-                    username: username
-                },
-                {
-                    email: username
-                }
+            $and: [{
+                $or: [
+                    {
+                        username: username
+                    },
+                    {
+                        email: username
+                    }
+                ]
+            },
+            {
+                isUserVerified: true
+            }
             ]
         })
 
@@ -257,4 +332,4 @@ const userBio = async (req, res) => {
     }
 }
 
-export { registerUser, loginUser, logoutUser, getCurrentUser, profileImage, userProfile, userBio }
+export { registerUser, loginUser, logoutUser, getCurrentUser, profileImage, userProfile, userBio, verifyOTPCode }
