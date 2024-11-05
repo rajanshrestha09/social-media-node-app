@@ -3,13 +3,18 @@ import APIResponse from './APIResponse.js'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+
+
 export async function sendVerificationEmail(email, username, verifyCode) {
     try {
        const data = await resend.emails.send({
             from: "email@rajanshr.com",
             to: email,
             subject: "OTP Code for Registration",
-            html: `<p>Hello <strong> ${username}</strong>,<br> Your verification code is : ${verifyCode}</p>`
+            html: `<p>Hello <strong> ${username}</strong>,<br> Your verification code is : ${verifyCode}</p>`,
+            headers: {
+                Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+              },
         })
 
         
