@@ -40,7 +40,7 @@ const Header = () => {
   ];
   return (
     <div className="w-full flex flex-col items-center mt-4 md:flex-row md:justify-between md:items-center md:space-x-4 px-4">
-      <div className="font-bold text-lg mb-4 md:mb-0">Problem-To-Solution</div>
+      <div className="font-bold text-lg mb-4 md:mb-0">Get-<span className="text-green-600">Solution</span></div>
       <div className="w-full space-y-4 md:w-auto flex justify-center md:justify-end items-center space-x-4">
         <NavigationMenu className="">
           <NavigationMenuList className="flex flex-col items-center space-y-6 md:space-y-0 md:flex-row md:space-x-4 ">
